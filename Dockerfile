@@ -1,4 +1,7 @@
 FROM golang:1.14.4-alpine3.12 AS build-env
+ENV GO111MODULE=on
+ENV GOPATH=
+
 RUN apk --no-cache add gcc musl-dev git
 ADD . ./
 WORKDIR ./
