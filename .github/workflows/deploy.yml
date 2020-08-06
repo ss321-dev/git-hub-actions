@@ -38,7 +38,7 @@ jobs:
         run: docker push docker.pkg.github.com/${{ github.repository }}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
 
   dockle:
-    name: dockle scan
+    name: run dockle
     runs-on: ubuntu-18.04
     needs: ImageBuild
     steps:
@@ -69,10 +69,46 @@ jobs:
           SLACK_ICON_EMOJI: ${{ env.SLACK_ICON_EMOJI }}
           SLACK_MESSAGE: ${{ env.SCAN_RESULT }}
 
+  trivy:
+    name: run trivy
+    runs-on: ubuntu-18.04
+    needs: ImageBuild
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: login gitHub registry
+        run: docker login docker.pkg.github.com -u owner -p ${{ secrets.GITHUB_TOKEN }}
+      - name: pull image gitHub registry
+        run: docker pull docker.pkg.github.com/${{ github.repository }}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+      - name: Install commands
+        run: |
+          sudo apt install apt-transport-https gnupg
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+          echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -cs) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
+          sudo apt update
+          sudo apt install --no-install-recommends trivy
+          sudo snap install hub --classic
+
+          VERSION=$(curl --silent "https://api.github.com/repos/jgm/pandoc/releases/latest" | \
+                    grep '"tag_name":' | \
+                    sed -E 's/.*"([^"]+)".*/\1/')
+          curl -L -o pandoc.deb https://github.com/jgm/pandoc/releases/download/${VERSION}/pandoc-${VERSION}-1-amd64.deb
+          sudo dpkg -i pandoc.deb
+      - name: Scan Image
+        run: trivy -q --severity HIGH,CRITICAL --exit-code 1 docker.pkg.github.com/${{ github.repository }}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+      - name: Notify Result to Slack
+        uses: homoluctus/slatify@master
+        if: always()
+        with:
+          type: ${{ job.status }}
+          channel: '#general'
+          job_name: ':sniper: *Vulnerability Scan*'
+          url: ${{ secrets.SLACK_WEBHOOK }}
+
   ImagePush:
     name: push docker image
     runs-on: ubuntu-18.04
-    needs: dockle
+    needs: [trivy, dockle]
     steps:
       - name: checkout
         uses: actions/checkout@v2
