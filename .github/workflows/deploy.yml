@@ -101,7 +101,7 @@ jobs:
         if: always()
         with:
           type: ${{ job.status }}
-          channel: '#general'
+          channel: '#random'
           job_name: ':sniper: *Vulnerability Scan*'
           url: ${{ secrets.SLACK_WEBHOOK }}
 
