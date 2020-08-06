@@ -67,10 +67,9 @@ jobs:
         run: dockle docker.pkg.github.com/${{ github.repository }}/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
       - name: notify slack of results
         uses: rtCamp/action-slack-notify@e17352f
-        if: always()
-        with:
-          SLACK_COLOR: "good"
-          SLACK_TITLE: ${{ job.status }}
-          SLACK_MESSAGE: ":docker: *Dockle*"
+        env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_COLOR: "#1475dc"
+          SLACK_TITLE: "Dockle"
           SLACK_ICON_EMOJI: ${{ env.SLACK_ICON_EMOJI }}
+          SLACK_MESSAGE: ${{ env.SLACK_MESSAGE }}
