@@ -1,0 +1,33 @@
+name: Test_Git_Actions
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  DOCKER_IMAGE_NAME: "test-project"
+  VERSION: master-${{ github.sha }}
+
+jobs:
+  ImageBuild:
+    name: build docker image
+    runs-on: ubuntu-18.04
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: login gitHub registry
+        run: docker login docker.pkg.github.com -u owner -p ${{ secrets.GITHUB_TOKEN }}
+      - name: build docker image
+        run: docker build -t docker.pkg.github.com/${{ github.repository }}/$DOCKER_IMAGE_NAME:$VERSION ./
+      - name: set env docker image
+        run: echo '::set-env name=DOCKER_IMAGE::docker.pkg.github.com/${{ github.repository }}/$DOCKER_IMAGE_NAME:$VERSION'
+      - name: push image to gitHub registry
+        run: docker push docker.pkg.github.com/${{ github.repository }}/$DOCKER_IMAGE_NAME:$VERSION ./
+      - name: notice slack
+        uses: rtCamp/action-slack-notify@e17352f
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_COLOR: "#dc143c"
+          SLACK_TITLE: "Failure to Deploy to GitHub Pages :boom:"
+          SLACK_MESSAGE: ":closed_book: ${{ github.repository }}"
