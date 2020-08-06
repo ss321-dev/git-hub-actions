@@ -9,8 +9,10 @@ env:
   DOCKER_IMAGE_NAME: "test-project"
   DOCKER_IMAGE_TAG: master-${{ github.sha }}
 
+  SLACK_SUCCESS_COLOR: "good"
+  SLACK_FAILED_COLOR: "danger"
   SLACK_ICON_EMOJI: ":bell:"
-  SLACK_MESSAGE: ":closed_book: ${{ github.repository }}"
+  SLACK_TITLE: ":closed_book: ${{ github.repository }}"
 
 jobs:
   ImageBuild:
@@ -23,6 +25,15 @@ jobs:
         run: docker login docker.pkg.github.com -u owner -p ${{ secrets.GITHUB_TOKEN }}
       - name: build docker image
         run: docker build -t docker.pkg.github.com/${{ github.repository }}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ./
+      - name: notify slack of failure results
+        uses: rtCamp/action-slack-notify@e17352f
+        if: ${{ failure() }}
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_COLOR: ${{ SLACK_FAILED_COLOR }}
+          SLACK_TITLE: ${{ env.SLACK_TITLE }}
+          SLACK_ICON_EMOJI: ${{ env.SLACK_ICON_EMOJI }}
+          SLACK_MESSAGE: "failed to build docker image"
       - name: push image to gitHub registry
         run: docker push docker.pkg.github.com/${{ github.repository }}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
 
@@ -54,7 +65,7 @@ jobs:
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_COLOR: "#1475dc"
-          SLACK_TITLE: "Dockle Result"
+          SLACK_TITLE: ${{ env.SLACK_TITLE }}
           SLACK_ICON_EMOJI: ${{ env.SLACK_ICON_EMOJI }}
           SLACK_MESSAGE: ${{ env.SCAN_RESULT }}
 
@@ -70,15 +81,7 @@ jobs:
         if: ${{ failure() }}
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_COLOR: "danger"
-          SLACK_TITLE: "failed to workflow :boom:"
+          SLACK_COLOR: ${{ SLACK_FAILED_COLOR }}
+          SLACK_TITLE: ${{ env.SLACK_TITLE }}
           SLACK_ICON_EMOJI: ${{ env.SLACK_ICON_EMOJI }}
-          SLACK_MESSAGE: ${{ env.SLACK_MESSAGE }}
-      - name: notify slack of succsess results
-        uses: rtCamp/action-slack-notify@e17352f
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_COLOR: "good"
-          SLACK_TITLE: "successfully workflow"
-          SLACK_ICON_EMOJI: ${{ env.SLACK_ICON_EMOJI }}
-          SLACK_MESSAGE: ${{ env.SLACK_MESSAGE }}
+          SLACK_MESSAGE: "failed to push to ECR"
