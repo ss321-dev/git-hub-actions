@@ -31,3 +31,12 @@ jobs:
           SLACK_COLOR: "#dc143c"
           SLACK_TITLE: "Failure to Deploy to GitHub Pages :boom:"
           SLACK_MESSAGE: ":closed_book: ${{ github.repository }}"
+
+  dockle:
+    name: Dockle
+    runs-on: ubuntu-18.04
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: echo
+        run: echo $DOCKER_IMAGE
