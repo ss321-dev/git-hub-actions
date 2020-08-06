@@ -23,7 +23,7 @@ jobs:
       - name: set env docker image
         run: echo '::set-env name=DOCKER_IMAGE::docker.pkg.github.com/${{ github.repository }}/$DOCKER_IMAGE_NAME:$VERSION'
       - name: push image to gitHub registry
-        run: docker push docker.pkg.github.com/${{ github.repository }}/$DOCKER_IMAGE_NAME:$VERSION ./
+        run: docker push docker.pkg.github.com/${{ github.repository }}/$DOCKER_IMAGE_NAME:$VERSION
       - name: notify slack of failure results
         uses: rtCamp/action-slack-notify@e17352f
         if: ${{ failure() }}
