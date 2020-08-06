@@ -24,17 +24,28 @@ jobs:
         run: echo '::set-env name=DOCKER_IMAGE::docker.pkg.github.com/${{ github.repository }}/$DOCKER_IMAGE_NAME:$VERSION'
       - name: push image to gitHub registry
         run: docker push docker.pkg.github.com/${{ github.repository }}/$DOCKER_IMAGE_NAME:$VERSION ./
-      - name: notice slack
+      - name: notify slack of failure results
+        uses: rtCamp/action-slack-notify@e17352f
+        if: ${{ failure() }}
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_COLOR: "danger"
+          SLACK_TITLE: "failed to ImageBuild :boom:"
+          SLACK_ICON_EMOJI: ":bell:"
+          SLACK_MESSAGE: ":closed_book: ${{ github.repository }}"
+      - name: notify slack of succsess results
         uses: rtCamp/action-slack-notify@e17352f
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_COLOR: "#dc143c"
-          SLACK_TITLE: "Failure to Deploy to GitHub Pages :boom:"
+          SLACK_COLOR: "good"
+          SLACK_TITLE: "successfully ImageBuild :boom:"
+          SLACK_ICON_EMOJI: ":bell:"
           SLACK_MESSAGE: ":closed_book: ${{ github.repository }}"
 
   dockle:
     name: Dockle
     runs-on: ubuntu-18.04
+    needs: ImageBuild
     steps:
       - name: checkout
         uses: actions/checkout@v2
