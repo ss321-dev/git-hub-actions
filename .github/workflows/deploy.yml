@@ -60,7 +60,7 @@ jobs:
           sudo dpkg -i dockle.deb && rm dockle.deb
       - name: scan docker image
         id: dockle
-        run: echo ::set-output name=result::$(dockle --exit-code 1 --exit-level fatal docker.pkg.github.com/${{ github.repository }}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG})
+        run: echo ::set-output name=result::$(dockle -f json --exit-code 1 --exit-level fatal docker.pkg.github.com/${{ github.repository }}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG})
       - name: notify slack of results
         uses: rtCamp/action-slack-notify@e17352f
         env:
