@@ -7,7 +7,7 @@ on:
 
 env:
   DOCKER_IMAGE_NAME: "test-project"
-  VERSION: master-${{ github.sha }}
+  DOCKER_IMAGE_TAG: master-${{ github.sha }}
 
   SLACK_ICON_EMOJI: ":bell:"
   SLACK_MESSAGE: ":closed_book: ${{ github.repository }}"
@@ -22,9 +22,9 @@ jobs:
       - name: login gitHub registry
         run: docker login docker.pkg.github.com -u owner -p ${{ secrets.GITHUB_TOKEN }}
       - name: build docker image
-        run: docker build -t docker.pkg.github.com/${{ github.repository }}/$DOCKER_IMAGE_NAME:$VERSION ./
+        run: docker build -t docker.pkg.github.com/${{ github.repository }}/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG ./
       - name: push image to gitHub registry
-        run: docker push docker.pkg.github.com/${{ github.repository }}/$DOCKER_IMAGE_NAME:$VERSION
+        run: docker push docker.pkg.github.com/${{ github.repository }}/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
       - name: notify slack of failure results
         uses: rtCamp/action-slack-notify@e17352f
         if: ${{ failure() }}
@@ -50,3 +50,26 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v2
+      - name: Login GitHub Registry
+        run: docker login docker.pkg.github.com -u owner -p ${{ secrets.GITHUB_TOKEN }}
+      - name: Pull image from GitHub Registry
+        run: docker pull docker.pkg.github.com/${{ github.repository }}/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+      - name: Install dockle
+        run: |
+          VERSION=$(curl --silent "https://api.github.com/repos/goodwithtech/dockle/releases/latest" | \
+          grep '"tag_name":' | \
+          sed -E 's/.*"v([^"]+)".*/\1/' \
+          )
+          curl -L -o dockle.deb https://github.com/goodwithtech/dockle/releases/download/v${VERSION}/dockle_${VERSION}_Linux-64bit.deb
+          sudo dpkg -i dockle.deb
+          rm dockle.deb
+      - name: Check image with dockle
+        run: dockle docker.pkg.github.com/${{ github.repository }}/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+      - name: Notify Result to Slack
+        uses: homoluctus/slatify@master
+        if: always()
+        with:
+          type: ${{ job.status }}
+          job_name: ':docker: *Dockle*'
+          channel: '#general'
+          url: ${{ secrets.SLACK_WEBHOOK }}
