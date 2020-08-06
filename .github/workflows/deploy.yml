@@ -9,6 +9,9 @@ env:
   DOCKER_IMAGE_NAME: "test-project"
   VERSION: master-${{ github.sha }}
 
+  SLACK_ICON_EMOJI: ":bell:"
+  SLACK_MESSAGE: ":closed_book: ${{ github.repository }}"
+
 jobs:
   ImageBuild:
     name: build docker image
@@ -20,8 +23,6 @@ jobs:
         run: docker login docker.pkg.github.com -u owner -p ${{ secrets.GITHUB_TOKEN }}
       - name: build docker image
         run: docker build -t docker.pkg.github.com/${{ github.repository }}/$DOCKER_IMAGE_NAME:$VERSION ./
-      - name: set env docker image
-        run: echo '::set-env name=DOCKER_IMAGE::docker.pkg.github.com/${{ github.repository }}/$DOCKER_IMAGE_NAME:$VERSION'
       - name: push image to gitHub registry
         run: docker push docker.pkg.github.com/${{ github.repository }}/$DOCKER_IMAGE_NAME:$VERSION
       - name: notify slack of failure results
@@ -31,25 +32,21 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_COLOR: "danger"
           SLACK_TITLE: "failed to ImageBuild :boom:"
-          SLACK_ICON_EMOJI: ":bell:"
-          SLACK_MESSAGE: ":closed_book: ${{ github.repository }}"
+          SLACK_ICON_EMOJI: ${{ SLACK_ICON_EMOJI }}
+          SLACK_MESSAGE: ${{ SLACK_MESSAGE }}
       - name: notify slack of succsess results
         uses: rtCamp/action-slack-notify@e17352f
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_COLOR: "good"
           SLACK_TITLE: "successfully ImageBuild :boom:"
-          SLACK_ICON_EMOJI: ":bell:"
-          SLACK_MESSAGE: ":closed_book: ${{ github.repository }}"
+          SLACK_ICON_EMOJI: ${{ SLACK_ICON_EMOJI }}
+          SLACK_MESSAGE: ${{ SLACK_MESSAGE }}
 
   dockle:
-    name: Dockle
+    name: dockle scan
     runs-on: ubuntu-18.04
     needs: ImageBuild
     steps:
       - name: checkout
         uses: actions/checkout@v2
-      - name: echo
-        run: echo $DOCKER_IMAGE_NAME
-      - name: echo
-        run: echo $DOCKER_IMAGE
