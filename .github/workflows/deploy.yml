@@ -30,7 +30,7 @@ jobs:
         if: ${{ failure() }}
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_COLOR: ${{ SLACK_FAILED_COLOR }}
+          SLACK_COLOR: ${{ env.SLACK_FAILED_COLOR }}
           SLACK_TITLE: ${{ env.SLACK_TITLE }}
           SLACK_ICON_EMOJI: ${{ env.SLACK_ICON_EMOJI }}
           SLACK_MESSAGE: "failed to build docker image"
@@ -81,7 +81,7 @@ jobs:
         if: ${{ failure() }}
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_COLOR: ${{ SLACK_FAILED_COLOR }}
+          SLACK_COLOR: ${{ env.SLACK_FAILED_COLOR }}
           SLACK_TITLE: ${{ env.SLACK_TITLE }}
           SLACK_ICON_EMOJI: ${{ env.SLACK_ICON_EMOJI }}
           SLACK_MESSAGE: "failed to push to ECR"
