@@ -50,4 +50,6 @@ jobs:
       - name: checkout
         uses: actions/checkout@v2
       - name: echo
+        run: echo $DOCKER_IMAGE_NAME
+      - name: echo
         run: echo $DOCKER_IMAGE
