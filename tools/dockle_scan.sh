@@ -22,8 +22,8 @@ dockle_latest=$(
     grep '"tag_name":' | \
     sed -E 's/.*"v([^"]+)".*/\1/' \
 )
-curl -L -o dockle.deb https://github.com/goodwithtech/dockle/releases/download/v${dockle_latest}/dockle_${dockle_latest}_Linux-64bit.deb
-sudo dpkg -i dockle.deb && rm dockle.deb
+a=$( curl -L -o dockle.deb https://github.com/goodwithtech/dockle/releases/download/v${dockle_latest}/dockle_${dockle_latest}_Linux-64bit.deb )
+b=$( sudo dpkg -i dockle.deb && rm dockle.deb )
 
 scan_result=$(
     dockle -f json ${image_tag}
