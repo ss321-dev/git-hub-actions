@@ -26,7 +26,8 @@ dockle_latest=$(
 echo "image_tag: ${image_tag}"
 
 scan_result=$(
-    docker run --rm goodwithtech/dockle:v${dockle_latest} -f json ${image_tag}
+    docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+    goodwithtech/dockle:v${dockle_latest} -f json ${image_tag}
 )
 
 fatal_count=$(echo ${scan_result} | jq -r .summary.fatal)
