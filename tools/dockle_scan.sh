@@ -67,7 +67,7 @@ case ${error_level,,} in
     exit 1 ;;
 esac
 
-echo "FATAL : ${fatal_count} WARN : ${warn_count} INFO : ${info_count}"
+echo ::set-env name=DOCKLE_RESULT::$( echo "FATAL : ${fatal_count} WARN : ${warn_count} INFO : ${info_count}" )
 
 # 指定されたレベルの脆弱性が存在する場合はエラーを返す
 if [ ${error_count} -gt 0 ]; then
