@@ -16,8 +16,8 @@ env:
   DOCKLE_ERROR_LEVEL: "warn" # "fatal" or "warn" or "info"
 
 jobs:
-  ImageBuild:
-    name: build docker image
+  Run:
+    name: Git Hub Action
     runs-on: ubuntu-18.04
     steps:
       - name: checkout
@@ -25,35 +25,11 @@ jobs:
       - name: login gitHub registry
         run: docker login docker.pkg.github.com -u owner -p ${{ secrets.GITHUB_TOKEN }}
       - name: build docker image
-        run: docker build -t docker.pkg.github.com/${{ github.repository }}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ./
-      - name: notify slack of failure results
-        uses: rtCamp/action-slack-notify@e17352f
-        if: ${{ failure() }}
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_COLOR: ${{ env.SLACK_FAILED_COLOR }}
-          SLACK_TITLE: ${{ env.SLACK_TITLE }}
-          SLACK_ICON_EMOJI: ${{ env.SLACK_ICON_EMOJI }}
-          SLACK_MESSAGE: "failed to build docker image"
-      - name: push image to gitHub registry
-        run: docker push docker.pkg.github.com/${{ github.repository }}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
-
-  dockle:
-    name: run dockle
-    runs-on: ubuntu-18.04
-    needs: ImageBuild
-    steps:
-      - name: checkout
-        uses: actions/checkout@v2
-      - name: login gitHub registry
-        run: docker login docker.pkg.github.com -u owner -p ${{ secrets.GITHUB_TOKEN }}
-      - name: pull image gitHub registry
-        run: docker pull docker.pkg.github.com/${{ github.repository }}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+        run: docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ./
       - name: Run dockle
         id: dockle
         run: |
-          ScanResult=$(./tools/dockle_scan.sh \
-            -e ${DOCKLE_ERROR_LEVEL} -t "docker.pkg.github.com/${{ github.repository }}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}")
+          ScanResult=$(./tools/dockle_scan.sh -e ${DOCKLE_ERROR_LEVEL} -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG})
           echo ::set-output name=result::$(echo ${ScanResult})
       - name: notify slack of results
         uses: rtCamp/action-slack-notify@e17352f
