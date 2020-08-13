@@ -23,11 +23,11 @@ dockle_latest=$(
     sed -E 's/.*"v([^"]+)".*/\1/' \
 )
 
-temp=$(
+$(
     curl -L -o dockle.deb https://github.com/goodwithtech/dockle/releases/download/v${dockle_latest}/dockle_${dockle_latest}_Linux-64bit.deb
     sudo dpkg -i dockle.deb
     rm dockle.deb
-)
+) > /dev/null 2>&1
 
 scan_result=$(
     dockle -f json ${image_tag}
