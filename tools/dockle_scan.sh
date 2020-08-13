@@ -29,12 +29,10 @@ scan_result=$(
     dockle -f json ${image_tag}
 )
 
-<< COMMENT
-scan_result=$(
-    docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
-    goodwithtech/dockle:v${dockle_latest} -f json ${image_tag}
-)
-COMMENT
+#scan_result=$(
+#    docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+#    goodwithtech/dockle:v${dockle_latest} -f json ${image_tag}
+#)
 
 fatal_count=$(echo ${scan_result} | jq -r .summary.fatal)
 if [ "x${fatal_count}" = "xnull" ]; then
