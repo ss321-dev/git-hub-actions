@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -eu
 
 CMDNAME=$( basename "$0" )
@@ -58,5 +58,5 @@ echo "FATAL : ${fatal_count} WARN : ${warn_count} INFO : ${info_count}"
 
 # 指定されたレベルの脆弱性が存在する場合はエラーを返す
 if [ ${error_count} -gt 0 ]; then
-  echo "exit 1！"
+  exit 1
 fi
