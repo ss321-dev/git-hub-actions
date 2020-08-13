@@ -33,7 +33,7 @@ scan_result=$(
     dockle -f json ${image_tag}
 )
 
-# git hub action上で実行すると「failed to analyze image」が発生する
+# NOTE: git hub action上で実行すると「failed to analyze image」が発生する
 #scan_result=$(
 #    docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
 #    goodwithtech/dockle:v${dockle_latest} -f json ${image_tag}
