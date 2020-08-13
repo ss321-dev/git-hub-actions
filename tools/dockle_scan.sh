@@ -5,14 +5,14 @@ export LC_ALL=C
 
 CMDNAME=$( basename "$0" )
 
-while getopts t:e: opt
+while getopts i:f: opt
 do
   case $opt in
     "i" ) image_tag="${OPTARG}" ;;
     "f" ) error_level="${OPTARG}" ;;
       * ) echo "Usage: $CMDNAME [-e error_level] [-t docker-image-tag]" 1>&2
-          echo "  -e : stop error level" 1>&2
-          echo "  -t : docker image tag" 1>&2
+          echo "  -i : stop error level" 1>&2
+          echo "  -f : docker image tag" 1>&2
           exit 1 ;;
   esac
 done
