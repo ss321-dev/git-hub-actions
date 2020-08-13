@@ -10,7 +10,7 @@ do
   case $opt in
     "i" ) image_tag="${OPTARG}" ;;
     "f" ) error_level="${OPTARG}" ;;
-      * ) echo "Usage: $CMDNAME [-e error_level] [-t docker-image-tag]" 1>&2
+      * ) echo "Usage: $CMDNAME [-i docker-image-tag] [-f error_level]" 1>&2
           echo "  -i : stop error level" 1>&2
           echo "  -f : docker image tag" 1>&2
           exit 1 ;;
@@ -22,10 +22,11 @@ dockle_latest=$(
     grep '"tag_name":' | \
     sed -E 's/.*"v([^"]+)".*/\1/' \
 )
+curl -L -o dockle.deb https://github.com/goodwithtech/dockle/releases/download/v${VER}/dockle_${VER}_Linux-64bit.deb
+sudo dpkg -i dockle.deb && rm dockle.deb
 
 scan_result=$(
-    docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
-    goodwithtech/dockle:v${dockle_latest} -f json ${image_tag}
+    dockle -f json ${image_tag}
 )
 
 fatal_count=$(echo ${scan_result} | jq -r .summary.fatal)
