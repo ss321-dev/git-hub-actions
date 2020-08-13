@@ -31,12 +31,23 @@ jobs:
         run: ./tools/dockle_scan.sh -f ${DOCKLE_ERROR_LEVEL} -i ${DOCKER_IMAGE_NAME}/${DOCKER_IMAGE_TAG}
       - name: notify slack of results
         uses: rtCamp/action-slack-notify@e17352f
-        if: ${{ always() }}
+        if: ${{ success() }}
         env:
           SLACK_WEBHOOK:    ${{ secrets.SLACK_WEBHOOK }}
           SLACK_CHANNEL:    "random"
           SLACK_USERNAME:   ${{ env.SLACK_USERNAME }}
           SLACK_ICON_EMOJI: ${{ env.SLACK_ICON_EMOJI }}
-          SLACK_COLOR:      "#1475dc"
+          SLACK_COLOR:      ${{ env.SLACK_SUCCESS_COLOR }}
+          SLACK_TITLE:      ":closed_book: Dockle Result"
+          SLACK_MESSAGE:    ${{ env.DOCKLE_RESULT }}
+      - name: notify slack of results
+        uses: rtCamp/action-slack-notify@e17352f
+        if: ${{ failure() }}
+        env:
+          SLACK_WEBHOOK:    ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_CHANNEL:    "random"
+          SLACK_USERNAME:   ${{ env.SLACK_USERNAME }}
+          SLACK_ICON_EMOJI: ${{ env.SLACK_ICON_EMOJI }}
+          SLACK_COLOR:      ${{ env.SLACK_FAILED_COLOR }}
           SLACK_TITLE:      ":closed_book: Dockle Result"
           SLACK_MESSAGE:    ${{ env.DOCKLE_RESULT }}
