@@ -23,7 +23,7 @@ dockle_latest=$(
     sed -E 's/.*"v([^"]+)".*/\1/' \
 )
 
-echo ${image_tag}
+echo "image_tag: ${image_tag}"
 
 scan_result=$(
     docker run --rm goodwithtech/dockle:v${dockle_latest} -f json ${image_tag}
