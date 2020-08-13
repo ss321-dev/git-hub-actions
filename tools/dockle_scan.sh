@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-set -eu
+
+set -euo pipefail
+export LC_ALL=C
 
 CMDNAME=$( basename "$0" )
 
