@@ -23,7 +23,11 @@ dockle_latest=$(
     sed -E 's/.*"v([^"]+)".*/\1/' \
 )
 
-echo "image_tag: ${image_tag}"
+cat << EOT
+ERROR_LEVEL: ${error_level}
+IMAGE_TAG: ${image_tag}
+DOCKLE_LATEST: ${dockle_latest}
+EOT
 
 scan_result=$(
     docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
