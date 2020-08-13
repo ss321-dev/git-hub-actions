@@ -25,11 +25,11 @@ jobs:
       - name: login gitHub registry
         run: docker login docker.pkg.github.com -u owner -p ${{ secrets.GITHUB_TOKEN }}
       - name: build docker image
-        run: docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ./
+        run: docker build -t ${DOCKER_IMAGE_NAME}/${DOCKER_IMAGE_TAG} ./
       - name: Run dockle
         id: dockle
         run: |
-          ScanResult=$(./tools/dockle_scan.sh -e ${DOCKLE_ERROR_LEVEL} -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG})
+          ScanResult=$(./tools/dockle_scan.sh -e ${DOCKLE_ERROR_LEVEL} -t ${DOCKER_IMAGE_NAME}/${DOCKER_IMAGE_TAG})
           echo ::set-output name=result::$(echo ${ScanResult})
       - name: notify slack of results
         uses: rtCamp/action-slack-notify@e17352f
