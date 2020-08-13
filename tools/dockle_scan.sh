@@ -8,8 +8,8 @@ CMDNAME=$( basename "$0" )
 while getopts t:e: opt
 do
   case $opt in
-    "t" ) image_tag="${OPTARG}" ;;
-    "e" ) error_level="${OPTARG}" ;;
+    "i" ) image_tag="${OPTARG}" ;;
+    "f" ) error_level="${OPTARG}" ;;
       * ) echo "Usage: $CMDNAME [-e error_level] [-t docker-image-tag]" 1>&2
           echo "  -e : stop error level" 1>&2
           echo "  -t : docker image tag" 1>&2
