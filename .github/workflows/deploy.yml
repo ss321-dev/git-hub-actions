@@ -28,7 +28,7 @@ jobs:
         run: docker build -t ${DOCKER_IMAGE_NAME}/${DOCKER_IMAGE_TAG} ./
       - name: Run dockle
         id: dockle
-        run: ./tools/dockle_scan.sh -f ${DOCKLE_ERROR_LEVEL} -i ${DOCKER_IMAGE_NAME}/${DOCKER_IMAGE_TAG}
+        run: ./tools/dockle_scan.sh -f ${DOCKLE_ERROR_LEVEL}
       - name: notify slack of results
         uses: rtCamp/action-slack-notify@e17352f
         if: ${{ success() }}
